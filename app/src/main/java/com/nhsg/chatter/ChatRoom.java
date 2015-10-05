@@ -28,7 +28,6 @@ public class ChatRoom extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        Intent i = getIntent();
         sendBtn = (Button)findViewById(R.id.sendBtn);
         previousMessages = (ListView)findViewById(R.id.previousMessages);
         messageAdp = new ChatArrayAdapter(getApplicationContext(), R.layout.chat, new ArrayList<ChatMessage>());
