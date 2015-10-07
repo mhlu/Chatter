@@ -28,6 +28,9 @@ public class ChatRoom extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        Intent intent = this.getIntent();
+        String contactName = intent.getStringExtra("contact_name");
+
         sendBtn = (Button)findViewById(R.id.sendBtn);
         previousMessages = (ListView)findViewById(R.id.previousMessages);
         messageAdp = new ChatArrayAdapter(getApplicationContext(), R.layout.chat, new ArrayList<ChatMessage>());
@@ -36,7 +39,8 @@ public class ChatRoom extends AppCompatActivity {
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                sendChatMessage();
+                String chatMessage = chatText.getText().toString();
+                sendChatMessage(chatMessage);
             }
         });
 
@@ -47,14 +51,15 @@ public class ChatRoom extends AppCompatActivity {
             @Override
             public void onChanged() {
                 super.onChanged();
-                previousMessages.setSelection(messageAdp.getCount()-1);
+                previousMessages.setSelection(messageAdp.getCount() - 1);
             }
         });
 
+        sendChatMessage("Chatting with " + contactName);
     }
 
-    private boolean sendChatMessage() {
-        messageAdp.add(new ChatMessage(side, chatText.getText().toString()));
+    private boolean sendChatMessage(String message) {
+        messageAdp.add(new ChatMessage(side, message));
         chatText.setText("");
         side = !side;
 

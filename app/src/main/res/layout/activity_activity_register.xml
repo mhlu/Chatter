@@ -1,0 +1,48 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.nhsg.chatter.RegisterActivity">
+
+    <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical">
+
+    <EditText android:id="@+id/username_reg" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:hint="Username"
+        android:imeActionId="@+id/login"
+        android:imeActionLabel="@string/action_sign_in_short"
+        android:imeOptions="actionUnspecified" android:inputType="textPassword"
+        android:maxLines="1" android:singleLine="true" />
+
+    <EditText android:id="@+id/password_reg" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:hint="Password"
+        android:imeActionId="@+id/login"
+        android:imeActionLabel="@string/action_sign_in_short"
+        android:imeOptions="actionUnspecified" android:inputType="textPassword"
+        android:maxLines="1" android:singleLine="true" />
+
+    <EditText android:id="@+id/password_confirm_reg" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:hint="Confirm Password"
+        android:imeActionId="@+id/login"
+        android:imeActionLabel="@string/action_sign_in_short"
+        android:imeOptions="actionUnspecified" android:inputType="textPassword"
+        android:maxLines="1" android:singleLine="true" />
+
+        <EditText android:id="@+id/email_reg" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="Password"
+            android:imeActionId="@+id/login"
+            android:imeActionLabel="@string/action_sign_in_short"
+            android:imeOptions="actionUnspecified" android:inputType="textPassword"
+            android:maxLines="1" android:singleLine="true" />
+        <Button
+            android:id="@+id/register_button"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:layout_weight="1">
+        </Button>
+    </LinearLayout>
+
+</RelativeLayout>

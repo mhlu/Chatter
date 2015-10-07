@@ -1,6 +1,7 @@
 package com.nhsg.chatter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,10 @@ public class ContactListActivity extends AppCompatActivity {
                     mah_bitches.add(addContactField.getText().toString());
                     addContactField.setText("");
                 }
+                ListAdapter theAdapter = new ArrayAdapter<String>(ContactListActivity.this, android.R.layout.simple_list_item_1,
+                        mah_bitches);
+                ListView theListView = (ListView) findViewById(R.id.contactsListView);
+                theListView.setAdapter(theAdapter);
                 clearFocus();
 
             }
@@ -55,6 +61,10 @@ public class ContactListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: open messages with selected contact
+                Intent chatIntent = new Intent(ContactListActivity.this, ChatRoom.class);
+                String contactName = (String) ((ListView) findViewById(R.id.contactsListView) ).getItemAtPosition(position);
+                chatIntent.putExtra("contact_name", contactName);
+                startActivity(chatIntent);
             }
         });
     }
