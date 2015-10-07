@@ -7,8 +7,10 @@ public class ChatMessage {
 
     public boolean left;
     public String message;
-    public ChatMessage(Boolean left, String message) {
+    public String dateTime;
+    public ChatMessage(Boolean left, String message, String dateTime) {
         this.left = left;
         this.message = message;
+        this.dateTime = dateTime;
     }
 }

@@ -12,7 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ChatRoom extends AppCompatActivity {
 
@@ -59,7 +61,8 @@ public class ChatRoom extends AppCompatActivity {
     }
 
     private boolean sendChatMessage(String message) {
-        messageAdp.add(new ChatMessage(side, message));
+
+        messageAdp.add(new ChatMessage(side, message, DateFormat.getDateTimeInstance().format(new Date())));
         chatText.setText("");
         side = !side;
 
