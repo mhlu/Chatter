@@ -1,5 +1,6 @@
 package com.nhsg.chatter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +13,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ChatRoom extends AppCompatActivity {
 
@@ -20,6 +28,8 @@ public class ChatRoom extends AppCompatActivity {
     private ListView previousMessages;
     private EditText chatText;
     private Button sendBtn;
+    File chatLog;
+    FileWriter chatLogWriter;
     Intent in;
     private boolean side = false;
 
@@ -41,6 +51,11 @@ public class ChatRoom extends AppCompatActivity {
             public void onClick(View v) {
                 String chatMessage = chatText.getText().toString();
                 sendChatMessage(chatMessage);
+                try{
+                    chatLogWriter = new FileWriter(chatLog, true);
+                    chatLogWriter.append(chatMessage + "\n");
+                    chatLogWriter.close();
+                }catch (java.io.IOException e) {}
             }
         });
 
@@ -55,14 +70,28 @@ public class ChatRoom extends AppCompatActivity {
             }
         });
 
-        sendChatMessage("Chatting with " + contactName);
+//        sendChatMessage("Chatting with " + contactName);
+//        String string = "hello world!";
+
+        try {
+            chatLog = new File("data/data/com.nhsg.chatter/" + contactName);
+            if (!chatLog.exists()) {
+                chatLog.createNewFile();
+            } else {
+                Scanner scan = new Scanner(chatLog);
+                while (scan.hasNextLine()) {
+                    String line = scan.nextLine();
+                    sendChatMessage(line);
+                    //Here you can manipulate the string the way you want
+                }
+            }
+        } catch (java.io.IOException e) {}
     }
 
     private boolean sendChatMessage(String message) {
         messageAdp.add(new ChatMessage(side, message));
         chatText.setText("");
         side = !side;
-
         return true;
     }
 
@@ -86,5 +115,10 @@ public class ChatRoom extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
