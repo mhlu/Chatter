@@ -92,7 +92,6 @@ public class ChatRoom extends AppCompatActivity {
     }
 
     private boolean sendChatMessage(String message) {
-
         messageAdp.add(new ChatMessage(side, message, DateFormat.getDateTimeInstance().format(new Date())));
         chatText.setText("");
         side = !side;
