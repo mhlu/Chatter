@@ -28,6 +28,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A login screen that offers login via email/password.
@@ -81,11 +83,15 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             }
         });
 
-        Button mEmailRegisterButton = (Button) findViewById(R.id.register_button);
-        mEmailRegisterButton.setOnClickListener(new OnClickListener() {
+        Button registerButton = (Button) findViewById(R.id.register_button);
+        registerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+                String name = mEmailView.getText().toString();
+                String password = mPasswordView.getText().toString();
+                registerIntent.putExtra("name", name);
+                registerIntent.putExtra("password", name);
                 startActivity(registerIntent);
             }
         });
@@ -150,12 +156,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mAuthTask.execute((Void) null);
         }
     }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return true;
+    
+    public boolean isEmailValid(String email)
+    {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
-
+    
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return true;
