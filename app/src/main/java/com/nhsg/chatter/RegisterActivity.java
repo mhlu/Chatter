@@ -22,6 +22,12 @@ public class RegisterActivity extends AppCompatActivity {
                 String username = ((EditText) findViewById(R.id.username_reg)).getText().toString();
                 String password = ((EditText) findViewById(R.id.password_reg)).getText().toString();
                 String password_confirm = ((EditText) findViewById(R.id.password_confirm_reg)).getText().toString();
+
+                if( !password.equals(password_confirm) ) {
+                    EditText confirmET = (EditText) findViewById(R.id.password_confirm_reg);
+                    confirmET.setError("Passwords must match.");
+                }
+
                 String email = ((EditText) findViewById(R.id.email_reg)).getText().toString();
                 // TODO: send registration request to server
             }

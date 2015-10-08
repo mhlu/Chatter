@@ -13,7 +13,9 @@
         android:id="@+id/previousMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp"></ListView>
+        android:layout_marginBottom="80dp"
+        android:transcriptMode="alwaysScroll"
+        android:divider="@null"></ListView>
 
 
 
@@ -38,6 +40,5 @@
         android:layout_alignParentRight="true"
 
         ></Button>
-
 
 </RelativeLayout>

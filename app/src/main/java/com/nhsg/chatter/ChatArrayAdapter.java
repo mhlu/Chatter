@@ -19,7 +19,6 @@ import java.util.List;
  */
 public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
-    private TextView chatText;
     private List<ChatMessage> messageList = new ArrayList<ChatMessage>();
     private LinearLayout layout;
 
@@ -52,11 +51,14 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
         layout = (LinearLayout)v.findViewById(R.id.singleMessage);
         ChatMessage messageobj = getItem(position);
-        chatText = (TextView)v.findViewById(R.id.messageText);
 
+        TextView chatText = (TextView)v.findViewById(R.id.messageText);
         chatText.setText(messageobj.message);
         chatText.setBackgroundResource(
                 messageobj.left ? R.drawable.out_message_bg : R.drawable.in_message_bg);
+
+        TextView chatTime = (TextView)v.findViewById(R.id.messageTime);
+        chatTime.setText(messageobj.dateTime);
 
         layout.setGravity(messageobj.left ? Gravity.LEFT : Gravity.RIGHT );
         return v;

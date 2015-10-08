@@ -13,7 +13,7 @@
         android:layout_height="wrap_content" android:hint="Username"
         android:imeActionId="@+id/login"
         android:imeActionLabel="@string/action_sign_in_short"
-        android:imeOptions="actionUnspecified" android:inputType="textPassword"
+        android:imeOptions="actionUnspecified" android:inputType="text"
         android:maxLines="1" android:singleLine="true" />
 
     <EditText android:id="@+id/password_reg" android:layout_width="match_parent"
@@ -30,19 +30,19 @@
         android:imeOptions="actionUnspecified" android:inputType="textPassword"
         android:maxLines="1" android:singleLine="true" />
 
-        <EditText android:id="@+id/email_reg" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:hint="Password"
-            android:imeActionId="@+id/login"
-            android:imeActionLabel="@string/action_sign_in_short"
-            android:imeOptions="actionUnspecified" android:inputType="textPassword"
-            android:maxLines="1" android:singleLine="true" />
-        <Button
-            android:id="@+id/register_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:layout_weight="1">
-        </Button>
+    <EditText android:id="@+id/email_reg" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:hint="Email"
+        android:imeActionId="@+id/login"
+        android:imeActionLabel="@string/action_sign_in_short"
+        android:imeOptions="actionUnspecified" android:inputType="textEmailAddress"
+        android:maxLines="1" android:singleLine="true" />
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:layout_weight="1">
+    </Button>
     </LinearLayout>
 
 </RelativeLayout>
