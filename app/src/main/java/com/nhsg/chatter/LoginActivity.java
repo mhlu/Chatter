@@ -26,6 +26,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -138,11 +147,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
         }
+//        } else if (!isEmailValid(email)) {
+//            mEmailView.setError(getString(R.string.error_invalid_email));
+//            focusView = mEmailView;
+//            cancel = true;
+//        }
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -275,23 +285,51 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
+            String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/login/";
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+                // Create parameters JSONObject
+                JSONObject parameters = new JSONObject();
+                parameters.put("username", mEmail);
+                parameters.put("password", mPassword);
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
+
+                // Open connection to URL and perform POST request.
+                URL url = new URL(urlString);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoOutput(true);
+                connection.setFixedLengthStreamingMode(parameters.toString().getBytes().length);
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type",
+                        "application/json");
+
+                connection.setDoInput(true);
+
+                // Write serialized JSON data to output stream.
+                DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+                os.write(parameters.toString().getBytes());
+
+                int response_code = connection.getResponseCode();
+                String response_msg = connection.getResponseMessage().toString();
+
+
+                InputStream in = connection.getInputStream();
+                String encoding = connection.getContentEncoding();
+                encoding = encoding == null ? "UTF-8" : encoding;
+                String body = IOUtils.toString(in, encoding);
+
+                // Close streams and disconnect.
+                connection.disconnect();
+                os.close();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
             }
 
             // TODO: register the new account here.
-            return true;
+            return false;
         }
 
         @Override
