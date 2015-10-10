@@ -28,11 +28,6 @@ public class ContactListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
 
-        mah_bitches.add("Frank");
-        mah_bitches.add("Mike");
-        mah_bitches.add("Chester");
-        mah_bitches.add("Ron");
-
         addContactBtn = (Button) findViewById(R.id.addContactBtn);
         addContactField = (EditText) findViewById(R.id.addContactInput);
 
@@ -67,6 +62,16 @@ public class ContactListActivity extends AppCompatActivity {
                 startActivity(chatIntent);
             }
         });
+    }
+
+    
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mah_bitches.clear();
+
     }
 
     @Override

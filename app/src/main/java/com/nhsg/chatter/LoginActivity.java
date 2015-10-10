@@ -55,7 +55,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private EditText mEmailView;
@@ -119,10 +118,32 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
+
+
+    private class LoginCallback implements Callback {
+        public void call(Object... objs) {
+            JSONObject response = (JSONObject) objs[0];
+            int a = 1;
+
+            try {
+                if (response.get("status").toString().equals("success")) {
+                    Intent intent = new Intent(LoginActivity.this, ContactListActivity.class);
+                    intent.putExtra(Intent.EXTRA_TEXT, response.get("token").toString());
+                    startActivity(intent);
+                } else {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mPasswordView.requestFocus();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+
         }
+    }
+
+    public void attemptLogin() {
 
         // Reset errors.
         mEmailView.setError(null);
@@ -162,8 +183,18 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+
+            String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/login/";
+            PostTask loginTask = new PostTask(urlString);
+            loginTask.callback = new LoginCallback();
+            JSONObject loginRequest = new JSONObject();
+            try {
+                loginRequest.put("username", email);
+                loginRequest.put("password", password);
+            } catch (Exception e) {
+                System.out.println("Exception: " + e.toString());
+            }
+            loginTask.execute(loginRequest);
         }
     }
     
@@ -265,93 +296,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
 //        mEmailView.setAdapter(adapter);
-    }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/login/";
-            try {
-                // Create parameters JSONObject
-                JSONObject parameters = new JSONObject();
-                parameters.put("username", mEmail);
-                parameters.put("password", mPassword);
-
-
-                // Open connection to URL and perform POST request.
-                URL url = new URL(urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoOutput(true);
-                connection.setFixedLengthStreamingMode(parameters.toString().getBytes().length);
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type",
-                        "application/json");
-
-                connection.setDoInput(true);
-
-                // Write serialized JSON data to output stream.
-                DataOutputStream os = new DataOutputStream(connection.getOutputStream());
-                os.write(parameters.toString().getBytes());
-
-                int response_code = connection.getResponseCode();
-                String response_msg = connection.getResponseMessage().toString();
-
-
-                InputStream in = connection.getInputStream();
-                String encoding = connection.getContentEncoding();
-                encoding = encoding == null ? "UTF-8" : encoding;
-                String body = IOUtils.toString(in, encoding);
-
-                // Close streams and disconnect.
-                connection.disconnect();
-                os.close();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
-
-            // TODO: register the new account here.
-            return false;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-                Intent chatIntent = new Intent(LoginActivity.this, ContactListActivity.class);
-                startActivity(chatIntent);
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
     }
 }
 
