@@ -16,17 +16,23 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContactListActivity extends AppCompatActivity {
     private Button addContactBtn;
     private EditText addContactField;
-    List<String> mah_bitches = new ArrayList<String>();
+    private ContactListCallback contactListCallback;
+    List<String> contactList = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
+
+        contactListCallback = new ContactListCallback(contactList);
 
         addContactBtn = (Button) findViewById(R.id.addContactBtn);
         addContactField = (EditText) findViewById(R.id.addContactInput);
@@ -35,12 +41,12 @@ public class ContactListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String newContact = addContactField.getText().toString();
-                if (newContact.length() > 0 && !mah_bitches.contains(newContact)) {
-                    mah_bitches.add(addContactField.getText().toString());
+                if (newContact.length() > 0 && !contactList.contains(newContact)) {
+                    contactList.add(addContactField.getText().toString());
                     addContactField.setText("");
                 }
                 ListAdapter theAdapter = new ArrayAdapter<String>(ContactListActivity.this, android.R.layout.simple_list_item_1,
-                        mah_bitches);
+                        contactList);
                 ListView theListView = (ListView) findViewById(R.id.contactsListView);
                 theListView.setAdapter(theAdapter);
                 clearFocus();
@@ -49,7 +55,7 @@ public class ContactListActivity extends AppCompatActivity {
         });
 
         ListAdapter theAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                mah_bitches);
+                contactList);
         ListView theListView = (ListView) findViewById(R.id.contactsListView);
         theListView.setAdapter(theAdapter);
         theListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -62,15 +68,49 @@ public class ContactListActivity extends AppCompatActivity {
                 startActivity(chatIntent);
             }
         });
+
+
     }
 
-    
+    private class ContactListCallback implements Callback {
+        private List<String> contactList;
+        public ContactListCallback(List<String> contactList) {
+            this.contactList = contactList;
+        }
+        public void call(Object... objs) {
+            JSONObject response = (JSONObject) objs[0];
+            int a = 1;
+
+            try {
+                if (response.get("status").toString().equals("success")) {
+                    int b = 3;
+                } else {
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        mah_bitches.clear();
+        contactList.clear();
+
+        Bundle extras = getIntent().getExtras();
+        String token = extras.get("token").toString();
+
+        String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/getfriendlist/";
+        PostTask fetchContactsTask = new PostTask(urlString);
+        fetchContactsTask.callback = contactListCallback;
+        JSONObject contactListRequest = new JSONObject();
+        try {
+            contactListRequest.put("token", token);
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.toString());
+        }
+        fetchContactsTask.execute(contactListRequest);
 
     }
 

@@ -128,7 +128,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             try {
                 if (response.get("status").toString().equals("success")) {
                     Intent intent = new Intent(LoginActivity.this, ContactListActivity.class);
-                    intent.putExtra(Intent.EXTRA_TEXT, response.get("token").toString());
+                    intent.putExtra("token", response.get("token").toString());
+
                     startActivity(intent);
                 } else {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
