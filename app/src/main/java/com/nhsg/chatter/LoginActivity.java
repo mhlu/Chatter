@@ -131,6 +131,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     Intent intent = new Intent(LoginActivity.this, ContactListActivity.class);
                     intent.putExtra("token", response.get("token").toString());
                     intent.putExtra("user_id", response.get("user_id").toString());
+                    ((State)getApplication()).setLastPollTime(Long.getLong(response.get("last_poll_time").toString()));
 
                     startActivity(intent);
                 } else {
@@ -140,9 +141,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
-
         }
     }
 

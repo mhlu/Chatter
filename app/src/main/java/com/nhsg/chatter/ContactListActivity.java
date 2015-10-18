@@ -28,17 +28,21 @@ import java.util.Map;
 public class ContactListActivity extends AppCompatActivity {
     private Button addContactBtn;
     private EditText addContactField;
-    private ContactListCallback contactListCallback;
+    private PopulateContactListCallback populateContactListCallback;
+    private AddContactCallback addContactCallback;
     private String user_id;
     private String token;
+    private Long last_poll_time;
     Map<String, String> getID = new HashMap<String, String>();
     List<String> contactList = new ArrayList<String>();
 
-    private class ContactListCallback implements Callback {
+    private class PopulateContactListCallback implements Callback {
         public void call(Object... objs) {
             JSONObject response = (JSONObject) objs[0];
 
             try {
+                contactList.clear();
+                getID.clear();
 //                if (response.get("status").toString().equals("success")) {
                     JSONArray friends =  (JSONArray)response.get("friends");
                     for(int i = 0; i < friends.length(); i++){
@@ -48,8 +52,36 @@ public class ContactListActivity extends AppCompatActivity {
                         contactList.add(username);
                         getID.put(username, userid);
                     }
+
                     refreshContactList();
+                    clearFocus();
 //                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private class AddContactCallback implements Callback {
+        public void call(Object... objs) {
+            JSONObject response = (JSONObject) objs[0];
+
+            try {
+                if (response.get("status").toString().equals("success")) {
+                    String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/getfriendlist/";
+                    PostTask fetchContactsTask = new PostTask(urlString);
+                    fetchContactsTask.callback = populateContactListCallback;
+                    JSONObject contactListRequest = new JSONObject();
+                    try {
+                        contactListRequest.put("token", token);
+                        contactListRequest.put("user_id", user_id);
+                    } catch (Exception e) {
+                        System.out.println("Exception: " + e.toString());
+                    }
+                    fetchContactsTask.execute(contactListRequest);
+                    refreshContactList();
+                    clearFocus();
+                }
+//
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -67,10 +99,12 @@ public class ContactListActivity extends AppCompatActivity {
         token = extras.get("token").toString();
         user_id = extras.get("user_id").toString();
 
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
 
-        contactListCallback = new ContactListCallback();
+        populateContactListCallback = new PopulateContactListCallback();
+        addContactCallback = new AddContactCallback();
 
         addContactBtn = (Button) findViewById(R.id.addContactBtn);
         addContactField = (EditText) findViewById(R.id.addContactInput);
@@ -82,7 +116,7 @@ public class ContactListActivity extends AppCompatActivity {
 
                 String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/addfriend/";
                 PostTask addFriendTask = new PostTask(urlString);
-                addFriendTask.callback = contactListCallback;
+                addFriendTask.callback = addContactCallback;
                 JSONObject addfriendRequest = new JSONObject();
                 try {
                     addfriendRequest.put("token", token);
@@ -92,13 +126,6 @@ public class ContactListActivity extends AppCompatActivity {
                     System.out.println("Exception: " + e.toString());
                 }
                 addFriendTask.execute(addfriendRequest);
-
-                if (newContact.length() > 0 && !contactList.contains(newContact)) {
-                    contactList.add(addContactField.getText().toString());
-                    addContactField.setText("");
-                }
-                refreshContactList();
-                clearFocus();
 
             }
         });
@@ -117,6 +144,7 @@ public class ContactListActivity extends AppCompatActivity {
                 chatIntent.putExtra("user_id", user_id);
                 chatIntent.putExtra("token", token);
                 chatIntent.putExtra("target_id", getID.get(contactName));
+
                 startActivity(chatIntent);
             }
         });
@@ -133,12 +161,12 @@ public class ContactListActivity extends AppCompatActivity {
         contactList.clear();
 
         Bundle extras = getIntent().getExtras();
-        String token = extras.get("token").toString();
-        String user_id = extras.get("user_id").toString();
+        token = extras.get("token").toString();
+        user_id = extras.get("user_id").toString();
 
         String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/getfriendlist/";
         PostTask fetchContactsTask = new PostTask(urlString);
-        fetchContactsTask.callback = contactListCallback;
+        fetchContactsTask.callback = populateContactListCallback;
         JSONObject contactListRequest = new JSONObject();
         try {
             contactListRequest.put("token", token);
