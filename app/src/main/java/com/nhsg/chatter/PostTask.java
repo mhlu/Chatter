@@ -18,6 +18,7 @@ interface Callback {
 public class PostTask extends AsyncTask<JSONObject, Void, Void> {
     // onPostExecute displays the results of the AsyncTask.
     private String urlString;
+    JSONObject response = null;
     public Callback callback = null;
     public PostTask(String urlString) {
         this.urlString = urlString;
@@ -52,10 +53,7 @@ public class PostTask extends AsyncTask<JSONObject, Void, Void> {
             String encoding = connection.getContentEncoding();
             encoding = encoding == null ? "UTF-8" : encoding;
             String body = IOUtils.toString(in, encoding);
-            JSONObject response = new JSONObject(body);
-            if (callback != null) {
-                callback.call(response);
-            }
+            response = new JSONObject(body);
             // Close streams and disconnect.
             connection.disconnect();
             os.close();
@@ -67,5 +65,13 @@ public class PostTask extends AsyncTask<JSONObject, Void, Void> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        if (callback != null && response != null) {
+            callback.call(response);
+        }
     }
 }

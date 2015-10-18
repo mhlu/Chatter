@@ -122,6 +122,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     private class LoginCallback implements Callback {
         public void call(Object... objs) {
+            showProgress(false);
             JSONObject response = (JSONObject) objs[0];
             int a = 1;
 
@@ -129,6 +130,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 if (response.get("status").toString().equals("success")) {
                     Intent intent = new Intent(LoginActivity.this, ContactListActivity.class);
                     intent.putExtra("token", response.get("token").toString());
+                    intent.putExtra("user_id", response.get("user_id").toString());
 
                     startActivity(intent);
                 } else {
@@ -273,6 +275,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
 //        addEmailsToAutoComplete(emails);
     }
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {

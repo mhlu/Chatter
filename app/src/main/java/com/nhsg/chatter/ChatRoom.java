@@ -36,6 +36,10 @@ public class ChatRoom extends AppCompatActivity {
     Intent in;
     private boolean side = false;
 
+
+    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
