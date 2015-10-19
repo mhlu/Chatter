@@ -31,8 +31,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -62,7 +64,10 @@ public class ChatRoom extends AppCompatActivity {
     private String target_id;
     private Long last_poll_time;
 
+    private Set<Integer> message_set;
+
     final Semaphore write_semaphore = new Semaphore();
+    final Semaphore poll_semaphore = new Semaphore();
 
     private class ReceiveMessageCallback implements Callback {
         public void call(Object... objs) {
@@ -76,11 +81,18 @@ public class ChatRoom extends AppCompatActivity {
                     String friend_id = key_it.next();
                     JSONArray new_messages = (JSONArray) messages.get(friend_id);
                     for (int i = 0; i < new_messages.length(); i++) {
+
                         JSONObject message = (JSONObject) new_messages.get(i);
+
+                        int id = message.getInt("id");
+                        if (message_set.contains(id)) {
+                            continue;
+                        }
+                        message_set.add(id);
                         String content = message.getString("content");
                         String sender = message.getString("sender");
                         Long sent_time = message.getLong("sent_time");
-                        Date timestamp= new java.util.Date((long)sent_time*1000);
+                        Date timestamp = new java.util.Date((long)sent_time*1000);
                         if (sender.equals(target_id)) {
                             sendChatMessage(content, timestamp.toString(), false);
                         }
@@ -91,7 +103,8 @@ public class ChatRoom extends AppCompatActivity {
                             chatLogWriter.write(timestamp + "\n");
                             chatLogWriter.write(content + "\n");
                             chatLogWriter.close();
-                        }catch (java.io.IOException e) {}
+                        } catch (java.io.IOException e) {}
+
                     }
                 }
                 write_semaphore.release();
@@ -130,6 +143,8 @@ public class ChatRoom extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
+
+        message_set = new HashSet<Integer>();
 
         Intent intent = getIntent();
         contact_name = intent.getStringExtra("contact_name");
@@ -203,6 +218,7 @@ public class ChatRoom extends AppCompatActivity {
                 handler.post(new Runnable() {
                     public void run() {
                         try {
+                            poll_semaphore.take();
                             String urlString = "http://messengerproject-dev.elasticbeanstalk.com/messaging/poll/";
                             PostTask pollTask = new PostTask(urlString);
                             pollTask.callback = new ReceiveMessageCallback();
@@ -210,16 +226,16 @@ public class ChatRoom extends AppCompatActivity {
                             try {
                                 pollRequest.put("token", token);
                                 pollRequest.put("user_id", user_id);
-                                pollRequest.put("time", ((State)getApplication()).getLastPollTime());
-//                                Date curDate = new Date();
-//                                SimpleDateFormat sdf = new SimpleDateFormat();
-//                                sdf.setTimeZone(new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC"));
-//                                Date yourUtcDate = sdf.parse(curDate.toString());
+                                Long last_poll_time = ((State) getApplication()).getLastPollTime();
+                                //System.out.println(last_poll_time);
+                                pollRequest.put("time", ((State) getApplication()).getLastPollTime());
                                 ((State)getApplication()).setLastPollTime(new Date().getTime() / 1000L);
                             } catch (Exception e) {
                                 System.out.println("Exception: " + e.toString());
                             }
                             pollTask.execute(pollRequest);
+                            poll_semaphore.release();
+
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                         }
